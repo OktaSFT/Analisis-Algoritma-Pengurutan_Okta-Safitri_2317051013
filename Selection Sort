@@ -1,1 +1,70 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <ctime>
+#include <cstdlib>
+#include <chrono>
+
+void selectionSort(std::vector<int>& arr) {
+    int n = arr.size();
+    for (int i = 0; i < n - 1; ++i) {
+        int minIdx = i;
+        for (int j = i + 1; j < n; ++j) {
+            if (arr[j] < arr[minIdx]) {
+                minIdx = j;
+            }
+        }
+        std::swap(arr[i], arr[minIdx]);
+    }
+}
+
+void generateRandomData(std::vector<int>& arr, int N) {
+    arr.clear();
+    arr.resize(N);
+    std::srand(std::time(0));
+    for (int i = 0; i < N; ++i) {
+        arr[i] = std::rand() % 10000;
+    }
+}
+
+void generateReverseSortedData(std::vector<int>& arr, int N) {
+    generateRandomData(arr, N);
+    std::sort(arr.begin(), arr.end(), std::greater<int>());
+}
+
+void generateSortedData(std::vector<int>& arr, int N) {
+    generateRandomData(arr, N);
+    std::sort(arr.begin(), arr.end());
+}
+
+void testSelectionSort(int N, const std::string& dataType) {
+    std::vector<int> arr;
+
+    if (dataType == "random") {
+        generateRandomData(arr, N);
+    } else if (dataType == "reverse") {
+        generateReverseSortedData(arr, N);
+    } else if (dataType == "sorted") {
+        generateSortedData(arr, N);
+    }
+
+    auto start = std::chrono::high_resolution_clock::now();
+    selectionSort(arr);
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duration = end - start;
+
+    std::cout << "Selection Sort with N=" << N << " (" << dataType << " data) took " << duration.count() << " seconds.\n";
+}
+
+int main() {
+    std::string dataTypes[] = {"random", "reverse", "sorted"};
+    for (const std::string& dataType : dataTypes) {
+        testSelectionSort(10, dataType);
+        testSelectionSort(100, dataType);
+        testSelectionSort(500, dataType);
+        testSelectionSort(1000, dataType);
+        testSelectionSort(10000, dataType);
+    }
+    return 0;
+}
 
