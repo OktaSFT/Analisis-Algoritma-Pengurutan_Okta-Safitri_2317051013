@@ -1,1 +1,97 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <ctime>
+#include <cstdlib>
+#include <chrono>
+
+void merge(std::vector<int>& arr, int left, int mid, int right) {
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+
+    std::vector<int> L(n1), R(n2);
+
+    for (int i = 0; i < n1; ++i)
+        L[i] = arr[left + i];
+    for (int i = 0; i < n2; ++i)
+        R[i] = arr[mid + 1 + i];
+
+    int i = 0, j = 0, k = left;
+    while (i < n1 && j < n2) {
+        if (L[i] <= R[j]) {
+            arr[k++] = L[i++];
+        } else {
+            arr[k++] = R[j++];
+        }
+    }
+
+    while (i < n1) {
+        arr[k++] = L[i++];
+    }
+
+    while (j < n2) {
+        arr[k++] = R[j++];
+    }
+}
+
+void mergeSort(std::vector<int>& arr, int left, int right) {
+    if (left < right) {
+        int mid = left + (right - left) / 2;
+
+        mergeSort(arr, left, mid);
+        mergeSort(arr, mid + 1, right);
+
+        merge(arr, left, mid, right);
+    }
+}
+
+void generateRandomData(std::vector<int>& arr, int N) {
+    arr.clear();
+    arr.resize(N);
+    std::srand(std::time(0));
+    for (int i = 0; i < N; ++i) {
+        arr[i] = std::rand() % 10000;
+    }
+}
+
+void generateReverseSortedData(std::vector<int>& arr, int N) {
+    generateRandomData(arr, N);
+    std::sort(arr.begin(), arr.end(), std::greater<int>());
+}
+
+void generateSortedData(std::vector<int>& arr, int N) {
+    generateRandomData(arr, N);
+    std::sort(arr.begin(), arr.end());
+}
+
+void testMergeSort(int N, const std::string& dataType) {
+    std::vector<int> arr;
+
+    if (dataType == "random") {
+        generateRandomData(arr, N);
+    } else if (dataType == "reverse") {
+        generateReverseSortedData(arr, N);
+    } else if (dataType == "sorted") {
+        generateSortedData(arr, N);
+    }
+
+    auto start = std::chrono::high_resolution_clock::now();
+    mergeSort(arr, 0, arr.size() - 1);
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duration = end - start;
+
+    std::cout << "Merge Sort with N=" << N << " (" << dataType << " data) took " << duration.count() << " seconds.\n";
+}
+
+int main() {
+    std::string dataTypes[] = {"random", "reverse", "sorted"};
+    for (const std::string& dataType : dataTypes) {
+        testMergeSort(10, dataType);
+        testMergeSort(100, dataType);
+        testMergeSort(500, dataType);
+        testMergeSort(1000, dataType);
+        testMergeSort(10000, dataType);
+    }
+    return 0;
+}
 
