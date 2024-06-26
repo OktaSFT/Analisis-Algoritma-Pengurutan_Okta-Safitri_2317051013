@@ -1,1 +1,79 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <ctime>
+#include <cstdlib>
+#include <chrono>
+
+int partition(std::vector<int>& arr, int low, int high) {
+    int pivot = arr[high];
+    int i = low - 1;
+
+    for (int j = low; j < high; ++j) {
+        if (arr[j] < pivot) {
+            std::swap(arr[++i], arr[j]);
+        }
+    }
+    std::swap(arr[i + 1], arr[high]);
+    return i + 1;
+}
+
+void quickSort(std::vector<int>& arr, int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high);
+
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
+void generateRandomData(std::vector<int>& arr, int N) {
+    arr.clear();
+    arr.resize(N);
+    std::srand(std::time(0));
+    for (int i = 0; i < N; ++i) {
+        arr[i] = std::rand() % 10000;
+    }
+}
+
+void generateReverseSortedData(std::vector<int>& arr, int N) {
+    generateRandomData(arr, N);
+    std::sort(arr.begin(), arr.end(), std::greater<int>());
+}
+
+void generateSortedData(std::vector<int>& arr, int N) {
+    generateRandomData(arr, N);
+    std::sort(arr.begin(), arr.end());
+}
+
+void testQuickSort(int N, const std::string& dataType) {
+    std::vector<int> arr;
+
+    if (dataType == "random") {
+        generateRandomData(arr, N);
+    } else if (dataType == "reverse") {
+        generateReverseSortedData(arr, N);
+    } else if (dataType == "sorted") {
+        generateSortedData(arr, N);
+    }
+
+    auto start = std::chrono::high_resolution_clock::now();
+    quickSort(arr, 0, arr.size() - 1);
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duration = end - start;
+
+    std::cout << "Quick Sort with N=" << N << " (" << dataType << " data) took " << duration.count() << " seconds.\n";
+}
+
+int main() {
+    std::string dataTypes[] = {"random", "reverse", "sorted"};
+    for (const std::string& dataType : dataTypes) {
+        testQuickSort(10, dataType);
+        testQuickSort(100, dataType);
+        testQuickSort(500, dataType);
+        testQuickSort(1000, dataType);
+        testQuickSort(10000, dataType);
+    }
+    return 0;
+}
 
